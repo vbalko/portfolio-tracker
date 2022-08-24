@@ -1,12 +1,12 @@
 import React from "react";
 
-import Firebase from "firebase";
-import config from "./config";
+//import Firebase from "firebase-admin/app";
+//import config from "./config";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    Firebase.initializeApp(config);
+    //Firebase.initializeApp(config);
 
     this.state = {
       developers: [],
@@ -24,16 +24,16 @@ class App extends React.Component {
   }
 
   writeUserData = () => {
-    Firebase.database().ref("/").set(this.state);
+    //Firebase.database().ref("/").set(this.state);
     console.log("DATA SAVED");
   };
 
   getUserData = () => {
-    let ref = Firebase.database().ref("/");
-    ref.on("value", (snapshot) => {
-      const state = snapshot.val();
-      this.setState(state);
-    });
+    // let ref = Firebase.database().ref("/");
+    // ref.on("value", (snapshot) => {
+    //   const state = snapshot.val();
+    //   this.setState(state);
+    // });
   };
 
   handleSubmit = (event) => {
