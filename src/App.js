@@ -1,164 +1,144 @@
-import React from "react";
+import { useState, useEffect, useMemo } from "react";
 
-//import Firebase from "firebase-admin/app";
-//import config from "./config";
+// react-router components
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    //Firebase.initializeApp(config);
+// Material Dashboard 2 React routes
+import routes from "routes";
 
-    this.state = {
-      developers: [],
-    };
-  }
+// Material Dashboard 2 React contexts
+import { CssBaseline } from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
+import Icon from "@mui/material/Icon";
 
-  componentDidMount() {
-    this.getUserData();
-  }
+// Material Dashboard 2 React themes
+import theme from "assets/theme";
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState !== this.state) {
-      this.writeUserData();
+// Material Dashboard 2 React Dark Mode themes
+import themeDark from "assets/theme-dark";
+
+// Material Dashboard 2 React components
+import MDBox from "components/MDBox";
+
+// Material Dashboard 2 React example components
+import Sidenav from "components/Sidenav";
+import Configurator from "components/Configurator";
+
+
+
+import {
+  useMaterialUIController,
+  setMiniSidenav,
+  setOpenConfigurator,
+} from "context";
+
+// Images
+import brandWhite from "assets/images/logo-ct.png";
+import brandDark from "assets/images/logo-ct-dark.png";
+
+export default function App() {
+  const [controller, dispatch] = useMaterialUIController();
+  const {
+    miniSidenav,
+    direction,
+    layout,
+    openConfigurator,
+    sidenavColor,
+    transparentSidenav,
+    whiteSidenav,
+    darkMode,
+  } = controller;
+  const [onMouseEnter, setOnMouseEnter] = useState(false);
+  // Open sidenav when mouse enter on mini sidenav
+  const handleOnMouseEnter = () => {
+    if (miniSidenav && !onMouseEnter) {
+      setMiniSidenav(dispatch, false);
+      setOnMouseEnter(true);
     }
-  }
-
-  writeUserData = () => {
-    //Firebase.database().ref("/").set(this.state);
-    console.log("DATA SAVED");
   };
 
-  getUserData = () => {
-    // let ref = Firebase.database().ref("/");
-    // ref.on("value", (snapshot) => {
-    //   const state = snapshot.val();
-    //   this.setState(state);
-    // });
-  };
-
-  handleSubmit = (event) => {
-    event.preventDefault();
-    let name = this.refs.name.value;
-    let role = this.refs.role.value;
-    let uid = this.refs.uid.value;
-
-    if (uid && name && role) {
-      const { developers } = this.state;
-      const devIndex = developers.findIndex((data) => {
-        return data.uid === uid;
-      });
-      developers[devIndex].name = name;
-      developers[devIndex].role = role;
-      this.setState({ developers });
-    } else if (name && role) {
-      const uid = new Date().getTime().toString();
-      const { developers } = this.state;
-      developers.push({ uid, name, role });
-      this.setState({ developers });
+  // Close sidenav when mouse leave mini sidenav
+  const handleOnMouseLeave = () => {
+    if (onMouseEnter) {
+      setMiniSidenav(dispatch, true);
+      setOnMouseEnter(false);
     }
-
-    this.refs.name.value = "";
-    this.refs.role.value = "";
-    this.refs.uid.value = "";
   };
 
-  removeData = (developer) => {
-    const { developers } = this.state;
-    const newState = developers.filter((data) => {
-      return data.uid !== developer.uid;
+  // Change the openConfigurator state
+  const handleConfiguratorOpen = () =>
+    setOpenConfigurator(dispatch, !openConfigurator);
+
+  const getRoutes = (allRoutes) =>
+    allRoutes.map((route) => {
+      if (route.collapse) {
+        return getRoutes(route.collapse);
+      }
+
+      if (route.route) {
+        return (
+          <Route
+            exact
+            path={route.route}
+            element={route.component}
+            key={route.key}
+          />
+        );
+      }
+
+      return null;
     });
-    this.setState({ developers: newState });
-  };
+  
+  const configsButton = (
+    <MDBox
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      width="3.25rem"
+      height="3.25rem"
+      bgColor="white"
+      shadow="sm"
+      borderRadius="50%"
+      position="fixed"
+      right="2rem"
+      bottom="2rem"
+      zIndex={99}
+      color="dark"
+      sx={{ cursor: "pointer" }}
+      onClick={handleConfiguratorOpen}
+    >
+      <Icon fontSize="small" color="inherit">
+        settings
+      </Icon>
+    </MDBox>
+  );
 
-  updateData = (developer) => {
-    this.refs.uid.value = developer.uid;
-    this.refs.name.value = developer.name;
-    this.refs.role.value = developer.role;
-  };
-
-  render() {
-    const { developers } = this.state;
-    return (
-      <React.Fragment>
-        <div className="container">
-          <div className="row">
-            <div className="col-xl-12">
-              <h1>Firebase Development Team</h1>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-xl-12">
-              {developers.map((developer) => (
-                <div
-                  key={developer.uid}
-                  className="card float-left"
-                  style={{ width: "18rem", marginRight: "1rem" }}
-                >
-                  <div className="card-body">
-                    <h5 className="card-title">{developer.name}</h5>
-                    <p className="card-text">{developer.role}</p>
-                    <button
-                      onClick={() => this.removeData(developer)}
-                      className="btn btn-link"
-                    >
-                      Delete
-                    </button>
-                    <button
-                      onClick={() => this.updateData(developer)}
-                      className="btn btn-link"
-                    >
-                      Edit
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-xl-12">
-              <h1>Add new team member here</h1>
-              <form onSubmit={this.handleSubmit}>
-                <div className="form-row">
-                  <input type="hidden" ref="uid" />
-                  <div className="form-group col-md-6">
-                    <label>Name</label>
-                    <input
-                      type="text"
-                      ref="name"
-                      className="form-control"
-                      placeholder="Name"
-                    />
-                  </div>
-                  <div className="form-group col-md-6">
-                    <label>Role</label>
-                    <input
-                      type="text"
-                      ref="role"
-                      className="form-control"
-                      placeholder="Role"
-                    />
-                  </div>
-                </div>
-                <button type="submit" className="btn btn-primary">
-                  Save
-                </button>
-              </form>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-xl-12">
-              <h3>
-                Tutorial{" "}
-                <a href="https://www.educative.io/edpresso/firebase-as-simple-database-to-react-app">
-                  here
-                </a>
-              </h3>
-            </div>
-          </div>
-        </div>
-      </React.Fragment>
-    );
-  }
+  return (
+    <ThemeProvider theme={darkMode ? themeDark : theme}>
+      <CssBaseline />
+      {layout === "dashboard" && (
+        <>
+          <Sidenav
+            color={sidenavColor}
+            brand={
+              (transparentSidenav && !darkMode) || whiteSidenav
+                ? brandDark
+                : brandWhite
+            }
+            brandName="Material Dashboard 2"
+            routes={routes}
+            onMouseEnter={handleOnMouseEnter}
+            onMouseLeave={handleOnMouseLeave}
+          />
+          <Configurator />
+          {configsButton}
+        </>
+      )}
+      {layout === "vr" && <Configurator />}
+      <Routes>
+        {getRoutes(routes)}
+        <Route path="*" element={<Navigate to="/dashboard" />} />
+      </Routes>
+    </ThemeProvider>
+  );
 }
-
-export default App;
