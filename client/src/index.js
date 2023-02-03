@@ -1,19 +1,40 @@
-// index.js
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import theme from './styles/theme';
-import App from './App';
+/**
+=========================================================
+* Material Dashboard 2 React - v2.1.0
+=========================================================
 
-import { MaterialUIControllerProvider } from './context';
+* Product Page: https://www.creative-tim.com/product/material-dashboard-react
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
 
-const root = createRoot(document.getElementById('root'));
+Coded by www.creative-tim.com
+
+ =========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+*/
+
+import React from "react";
+import ReactDOM from "react-dom/client";
+// import { BrowserRouter } from "react-router-dom";
+import App from "App";
+
+// Material Dashboard 2 React Context Provider
+import { MaterialUIControllerProvider } from "context";
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <BrowserRouter>
+<>
     <MaterialUIControllerProvider>
       <App />
     </MaterialUIControllerProvider>
-  </BrowserRouter>
-  );
+</>
+);
+
+// ReactDOM.render(
+//   <BrowserRouter>
+//     <MaterialUIControllerProvider>
+//       <App />
+//     </MaterialUIControllerProvider>
+//   </BrowserRouter>,
+//   document.getElementById("root")
+// );
